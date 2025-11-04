@@ -1,451 +1,412 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa dos Estágios</title>
-<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;700&family=Barlow:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-<style>
-/* ---------- CORES ---------- */
-:root {
-  --color-primary-dark: #263868;     /* Azul Escuro */
-  --color-accent-light: #0096D1;     /* Azul Claro */
-  --color-secondary-alert: #D2AE6D;  /* Ouro/Caramelo */
-  --color-gray: #A9ABAE;             /* Cinza */
-  --color-blue-medium: #006199;      /* Azul Médio */
-  --color-white: #FEFEFE;            /* Branco */
-  --color-black: #000000;            /* Preto */
-  --color-separator: #E0E0E0;
-}
-
-/* ---------- BASE ---------- */
-* {margin:0;padding:0;box-sizing:border-box;transition:all .3s ease-in-out}
-body{
-  font-family: 'Barlow', sans-serif;
-  font-weight: 400;
-  color: var(--color-primary-dark);
-  background: #fff;
-  line-height: 1.6;
-}
-
-/* ---------- TIPOGRAFIA ---------- */
-h3, .summary-title, .estagio-section h4 {
-  font-family: 'Khand', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-.estagio-header h3 {
-  font-size: 1.5rem;
-  margin: 0;
-}
-.summary-title {
-  font-size: 1.1rem;
-  letter-spacing: 0.5px;
-}
-.estagio-section h4 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-.estagio-header p, .reflexao p {
-  font-family: 'Barlow', sans-serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 0.9rem;
-  color: #666;
-}
-.estagio-list li {
-  font-family: 'Barlow', sans-serif;
-  font-weight: 400;
-  font-size: 1rem;
-  color: #333;
-}
-.summary-nav a {
-  font-family: 'Barlow', sans-serif;
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-.btn-voltar {
-  font-family: 'Barlow', sans-serif;
-  font-weight: 700;
-}
-
-/* ---------- MAPA DOS ESTÁGIOS ---------- */
-.progress-container{position:fixed;top:0;left:0;width:100%;height:6px;background:#e0e0e0;z-index:1000;display:block}
-.progress-bar{height:100%;background:var(--color-primary-dark);width:0%;transition:width .2s ease}
-.header-summary{background:var(--color-primary-dark);color:#fff;padding:20px 0;position:sticky;top:0;z-index:999;box-shadow:0 2px 10px rgba(0,0,0,.1);display:block}
-.summary-container{max-width:1000px;margin:0 auto;padding:0 15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
-.summary-nav{display:flex;gap:12px;flex-wrap:wrap}
-.summary-nav a{
-  color:#fff;
-  text-decoration:none;
-  padding:6px 10px;
-  border-radius:4px;
-  transition:all .3s;
-  white-space:nowrap;
-}
-.summary-nav a:hover,
-.summary-nav a.active{
-  background: var(--color-secondary-alert); /* #D2AE6D */
-  color: #fff !important;
-}
-.mapa-estagios{
-  display:flex;
-  flex-direction:column;
-  gap:30px;
-  max-width:1000px;
-  margin:0 auto;
-  padding:25px 15px 60px; /* Reduzido para botão não ficar muito longe */
-}
-.estagio-card{
-  background:var(--color-white);
-  padding:30px;
-  border-radius:8px;
-  box-shadow:0 4px 12px rgba(0,0,0,.1);
-  transition:all .3s;
-  border-left:5px solid transparent;
-  border-top:1px solid var(--color-separator);
-  scroll-margin-top:120px;
-}
-.estagio-card:hover{
-  transform:translateY(-3px);
-  box-shadow:0 8px 20px rgba(38,56,104,.2);
-  border-left:5px solid var(--color-primary-dark);
-}
-.estagio-header{display:flex;align-items:center;margin-bottom:20px}
-.estagio-icon{
-  background:var(--color-blue-medium);
-  color:#fff;
-  width:50px;height:50px;min-width:50px;
-  border-radius:50%;
-  display:flex;justify-content:center;align-items:center;
-  font-size:1.5rem;margin-right:20px;
-}
-.estagio-section{margin-top:25px;padding-top:15px;border-top:1px dashed var(--color-separator)}
-.estagio-section h4 i{color:var(--color-blue-medium);margin-right:8px}
-.estagio-list{list-style:none;padding-left:0}
-.estagio-list li{position:relative;margin-bottom:8px;padding-left:20px}
-.estagio-list li::before{content:"•";color:var(--color-accent-light);font-weight:bold;position:absolute;left:0}
-.reflexao{margin-top:30px;padding:15px;border-radius:6px;background:#f7fcfb;border:1px solid var(--color-accent-light);font-style:italic}
-.reflexao i{color:var(--color-blue-medium);margin-right:5px}
-.ramificacao-card{border-left-color:var(--color-secondary-alert)}
-.ramificacao-card:hover{box-shadow:0 8px 20px rgba(210,174,109,.4);border-left:5px solid var(--color-secondary-alert)}
-.ramificacao-card .estagio-icon{background:var(--color-secondary-alert);box-shadow:0 0 10px rgba(210,174,109,.5)}
-.ramificacao-card .estagio-icon i{color:#333}
-.ramificacao-card .reflexao{background:#f0f0f0;border-color:var(--color-gray)}
-.ramificacao-card .reflexao i{color:var(--color-primary-dark)}
-
-/* ---------- BOTÃO VOLTAR ---------- */
-.btn-voltar{
-  display:inline-block;
-  background:var(--color-accent-light);
-  color:#fff;
-  border-radius:50px;
-  padding:10px 24px;
-  margin-top:20px;
-  text-decoration:none;
-  font-weight:700;
-  transition:background .3s;
-  box-shadow: 0 2px 6px rgba(0,0,0,.15);
-}
-.btn-voltar:hover{background:var(--color-primary-dark)}
-
-/* ---------- RODAPÉ SIMPLES ---------- */
-footer{
-  background: var(--color-primary-dark);
-  color: #fff;
-  text-align: center;
-  padding: 20px 15px;
-  font-size: 0.9rem;
-  font-family: 'Barlow', sans-serif;
-}
-footer a{
-  color: var(--color-accent-light);
-  text-decoration: none;
-  font-weight: 600;
-}
-footer a:hover{
-  text-decoration: underline;
-}
-
-/* ---------- RESPONSIVO ---------- */
-@media (max-width:768px){
-  .summary-nav{justify-content:center}
-  .summary-title{text-align:center;width:100%}
-  .mapa-estagios{padding-bottom:80px}
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIA — Mini-Avaliação de Adaptação à Mudança (Brasfort)</title>
+  <style>
+    :root{
+      --brand:#0f4db6;
+      --brand-dark:#0a3a86;
+      --bg-start:#e7eefb;
+      --bot-bubble:#dff0ff;
+      --user-bubble:#dcf8c6;
+      --muted:#697582;
+      --glass: rgba(255,255,255,0.97);
+      --chat-width:420px;
+      --radius:16px;
+      --header-height:72px;
+      --font: 'Barlow', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    html,body{height:100%;margin:0;font-family:var(--font);background:linear-gradient(180deg,var(--bg-start) 0%, #eef4fb 100%);color:#17324a}
+    .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+    .app{width:100%;max-width:calc(var(--chat-width) + 280px);display:flex;gap:20px;align-items:flex-start;justify-content:center}
+    .phone{width:var(--chat-width);background:var(--glass);border-radius:18px;box-shadow:0 18px 35px rgba(16,40,80,0.12);overflow:hidden;border:1px solid rgba(10,30,70,0.06);height:88vh;display:flex;flex-direction:column}
+    .header{background:linear-gradient(90deg,var(--brand) 0%, var(--brand-dark) 100%);color:#fff;padding:10px 12px 10px 12px;display:flex;align-items:center;gap:10px;flex:0 0 var(--header-height);position:relative}
+    .back-btn{width:40px;height:40px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,255,255,0.12);cursor:pointer;margin-right:6px;flex:0 0 40px}
+    .avatar{width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.14);flex:0 0 48px;cursor:pointer}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .meta{flex:1;min-width:0}
+    .meta .name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta .status{font-size:12px;opacity:0.95}
+    .icons{display:flex;gap:8px;margin-left:8px}
+    .icon-btn{width:36px;height:36px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,255,255,0.12);cursor:pointer}
+    .icon-btn:hover{transform:translateY(-2px)}
+    .chat{padding:12px;display:flex;flex-direction:column;gap:12px;flex:1 1 auto;overflow:hidden}
+    .messages{flex:1 1 auto;overflow:auto;padding-right:6px;display:flex;flex-direction:column;gap:12px}
+    .bubble{max-width:78%;padding:10px 12px;border-radius:12px;line-height:1.35;box-shadow:0 6px 12px rgba(12,30,60,0.04);font-size:14px}
+    .bot{align-self:flex-start;background:var(--bot-bubble);border-top-left-radius:6px;color:#0c2b45}
+    .user{align-self:flex-end;background:var(--user-bubble);border-top-right-radius:6px;color:#06301a}
+    .typing{display:inline-flex;gap:8px;align-items:center;font-style:italic;color:#2b486f}
+    .dot{width:6px;height:6px;background:var(--brand);border-radius:50%;opacity:0.85;animation:blink 1s infinite}
+    .dot:nth-child(2){animation-delay:.12s}
+    .dot:nth-child(3){animation-delay:.24s}
+    @keyframes blink{0%,100%{opacity:.18}50%{opacity:1}}
+    .options{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .opt{background:white;border:1px solid rgba(15,77,182,0.12);padding:10px 12px;border-radius:12px;cursor:pointer;text-align:left;color:#07284a;font-weight:600}
+    .opt:hover{background:rgba(15,77,182,0.04)}
+    .footer{display:flex;gap:8px;padding:10px;background:transparent;align-items:center}
+    .start-btn{background:var(--brand);color:#fff;padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:700}
+    .start-btn.restart{background:#475569}
+    .profile-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,10,20,0.45);z-index:40}
+    .profile-card{width:360px;background:#fff;border-radius:12px;padding:18px;color:#1b2b43;box-shadow:0 10px 30px rgba(8,20,40,0.12)}
+    .profile-top{display:flex;gap:12px;align-items:center}
+    .profile-top img{width:84px;height:84px;border-radius:50%;object-fit:cover}
+    .profile-actions{display:flex;gap:8px;margin-top:12px}
+    .pbtn{flex:1;padding:10px;border-radius:8px;border:1px solid #e6eef9;cursor:pointer;background:#f7fbff}
+    .pbtn.whats{background:linear-gradient(90deg,var(--brand),var(--brand-dark));color:#fff;border:none}
+    .small{font-size:13px;color:#546579}
+    .side{width:260px;background:linear-gradient(180deg,#ffffff, #f7fbff);border-radius:12px;padding:12px;border:1px solid rgba(10,30,70,0.04)}
+    .side h4{margin:6px 0}
+    .side p{font-size:13px;color:#4b5b6b}
+    .result-card{
+      border-radius:12px;
+      padding:14px;
+      color:#08304a;
+      box-shadow:0 8px 18px rgba(8,20,40,0.08);
+      transform-origin:center;
+      opacity:0;
+      transform:translateY(18px) scale(0.94);
+      transition:opacity .55s ease,transform .55s ease;
+    }
+    .stage-title{font-weight:800;font-size:16px;margin-bottom:6px}
+    .stage-desc{font-size:14px;color:#0d3350}
+    .actions-row{display:flex;gap:8px;margin-top:10px}
+    .action-btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+    .action-whats{background:linear-gradient(90deg,var(--brand),var(--brand-dark));color:#fff}
+    @media(max-width:900px){.app{flex-direction:column;align-items:center}.side{display:none}.phone{height:94vh;width:96vw}}
+  </style>
 </head>
 <body>
-
-<div id="progressContainer" class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
-</div>
-
-<header class="header-summary" id="mapaHeader">
-    <div class="summary-container">
-        <div class="summary-title">JORNADA DE ADAPTAÇÃO</div>
-        <nav class="summary-nav">
-            <a href="#choque" data-stage="1">Choque</a>
-            <a href="#incerteza" data-stage="2">Incerteza</a>
-            <a href="#negacao" data-stage="3">Negação</a>
-            <a href="#crise" data-stage="4">Crise</a>
-            <a href="#saida" data-stage="ram">Saída da Curva</a>
-            <a href="#aceitacao" data-stage="5">Aceitação</a>
-            <a href="#decisao" data-stage="6">Decisão</a>
-            <a href="#integracao" data-stage="7">Integração</a>
-        </nav>
+  <div class="stage">
+    <div class="app">
+      <div class="phone" role="application" aria-label="Chat BIA">
+        <div class="header">
+          <div class="back-btn" id="backBtn" title="Voltar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="avatar" id="avatarBtn" title="Perfil da BIA">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaVmx61OauAWoTFDJ7eMLEd1zXSnsQdQZSoQ&s" alt="BIA avatar">
+          </div>
+          <div class="meta">
+            <div class="name">BIA — Brasfort IA</div>
+            <div class="status">Online | Assistente institucional</div>
+          </div>
+          <div class="icons">
+            <div class="icon-btn" id="callBtn" title="Abrir conversa RH (WhatsApp)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.12 1.05.34 2.07.65 3.05a2 2 0 0 1-.45 2.11L8.91 10.91a16 16 0 0 0 6 6l1.03-1.03a2 2 0 0 1 2.11-.45c.98.31 2 .53 3.05.65A2 2 0 0 1 22 16.92z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </div>
+            <div class="icon-btn" id="videoBtn" title="Chamada de vídeo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23 7l-7 5v4l7 5V7zM1 5h14v14H1z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </div>
+          </div>
+        </div>
+        <div class="chat" id="chatArea">
+          <div class="messages" id="messages"></div>
+          <div class="footer">
+            <button class="start-btn" id="startBtn">Iniciar conversa</button>
+          </div>
+        </div>
+      </div>
+      <aside class="side" aria-hidden>
+        <h4>BIA — como funciona</h4>
+        <p>Conversa guiada pela BIA para avaliar sua adaptação à mudança. Responda clicando nas opções. No final, receberá um <b>estágio</b> com orientação prática (sem pontuação numérica).</p>
+        <h4>Observações</h4>
+        <p class="small">Clique na foto para ver o perfil. Botão de chamada abre o WhatsApp do RH: <b>(61) 99605-0605</b>. Vídeo: não disponível.</p>
+      </aside>
     </div>
-</header>
+  </div>
 
-<div class="mapa-estagios">
-    <!-- 1. CHOQUE -->
-    <div class="estagio-card" id="choque" data-aos="fade-right">
-        <div class="estagio-header">
-            <div class="estagio-icon"><i class="fa-solid fa-meteor"></i></div>
-            <div><h3>1. CHOQUE</h3><p>“Fui pego de surpresa”</p></div>
+  <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="profile-card" role="document">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>BIA — Brasfort IA</strong>
+        <button onclick="closeModal()" style="background:transparent;border:none;font-size:18px;cursor:pointer">X</button>
+      </div>
+      <div class="profile-top">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaVmx61OauAWoTFDJ7eMLEd1zXSnsQdQZSoQ&s" alt="bia">
+        <div>
+          <div style="font-weight:700">BIA — Assistente institucional</div>
+          <div class="small">Apoio em gestão e desenvolvimento — respostas diretas e objetivas.</div>
+          <div style="margin-top:8px" class="small">Status: <span style="color:var(--brand)">Online</span></div>
         </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
-            <ul class="estagio-list">
-                <li>Respire fundo antes de reagir.</li>
-                <li>Anote o que você sentiu — sem julgamento.</li>
-                <li>Converse com alguém de confiança, apenas para ouvir e organizar pensamentos.</li>
-            </ul>
+      </div>
+      <div style="margin-top:12px">
+        <div class="small">Contato RH</div>
+        <div style="display:flex;gap:8px;margin-top:8px" class="profile-actions">
+          <button class="pbtn whats" onclick="openWhats()">Abrir WhatsApp<br><small style="opacity:.9">(61) 99605-0605</small></button>
+          <button class="pbtn" onclick="copyNumber()">Copiar número</button>
         </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
-            <ul class="estagio-list">
-                <li>Leia o comunicado oficial inteiro antes de tirar conclusões.</li>
-                <li>Liste o que muda e o que não muda no seu trabalho.</li>
-                <li>Participe da primeira explicação ou reunião sobre o tema.</li>
-            </ul>
-        </div>
-        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que eu realmente sei — e o que estou apenas supondo?”</p></div>
+      </div>
     </div>
+  </div>
 
-    <!-- 2. INCERTEZA -->
-    <div class="estagio-card" id="incerteza" data-aos="fade-left">
-        <div class="estagio-header">
-            <div class="estagio-icon"><i class="fa-solid fa-question"></i></div>
-            <div><h3>2. INCERTEZA</h3><p>“Será que vai dar certo?”</p></div>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
-            <ul class="estagio-list">
-                <li>Escreva suas dúvidas em vez de deixá-las rodando na cabeça.</li>
-                <li>Procure respostas em fontes oficiais (não no boato).</li>
-                <li>Organize uma rotina mínima para manter equilíbrio.</li>
-            </ul>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
-            <ul class="estagio-list">
-                <li>Vá a um plantão tira-dúvidas ou envie uma pergunta objetiva.</li>
-                <li>Teste uma nova ferramenta ou rotina por 15 minutos.</li>
-                <li>Compartilhe 1 dificuldade com seu líder — não espere acumular.</li>
-            </ul>
-        </div>
-        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “Do que eu tenho medo — e o que já posso controlar hoje?”</p></div>
-    </div>
-
-    <!-- 3. NEGAÇÃO -->
-    <div class="estagio-card" id="negacao" data-aos="fade-right">
-        <div class="estagio-header">
-            <div class="estagio-icon"><i class="fa-solid fa-ban"></i></div>
-            <div><h3>3. NEGAÇÃO</h3><p>“Isso não vai funcionar”</p></div>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
-            <ul class="estagio-list">
-                <li>Observe se você está defendendo o antigo por hábito, não por resultado.</li>
-                <li>Experimente olhar uma história real de quem já fez diferente.</li>
-                <li>Escreva 1 coisa boa que pode surgir com o novo.</li>
-            </ul>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
-            <ul class="estagio-list">
-                <li>Peça para ver na prática (demo, visita, simulação).</li>
-                <li>Compare dados e não opiniões.</li>
-                <li>Teste o novo processo por 1 dia, com curiosidade, não obrigação.</li>
-            </ul>
-        </div>
-        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que eu ganho se der certo — e o que perco se eu nem tentar?”</p></div>
-    </div>
-
-    <!-- 4. CRISE -->
-    <div class="estagio-card" id="crise" data-aos="fade-left">
-        <div class="estagio-header">
-            <div class="estagio-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <div><h3>4. CRISE</h3><p>“Nada faz sentido”</p></div>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
-            <ul class="estagio-list">
-                <li>Faça uma pausa de 2 minutos e nomeie o que sente.</li>
-                <li>Reduza o ritmo — cuide do básico (sono, alimentação, conversa).</li>
-                <li>Escolha 1 coisa pequena para retomar o foco.</li>
-            </ul>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
-            <ul class="estagio-list">
-                <li>Faça 1 teste simples na sua rotina (algo que dependa só de você).</li>
-                <li>Peça ajuda ao líder ou mentor de pares.</li>
-                <li>Registre 1 aprendizado, mesmo que o resultado não tenha sido bom.</li>
-            </ul>
-        </div>
-        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que posso fazer agora para melhorar 5% o meu dia?”</p></div>
-    </div>
-
-    <!-- RAMIFICAÇÃO -->
-    <div class="estagio-card ramificacao-card" id="saida" data-aos="zoom-in">
-        <div class="estagio-header">
-            <div class="estagio-icon"><i class="fa-solid fa-mask"></i></div>
-            <div><h3>RAMIFICAÇÃO: SAÍDA DA CURVA</h3><p>“Não quero mais saber”</p></div>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
-            <ul class="estagio-list">
-                <li>Pare e reflita: o que está me incomodando — a mudança ou o medo de perder o controle?</li>
-                <li>Avalie se ainda faz sentido para você estar neste ambiente.</li>
-            </ul>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
-            <ul class="estagio-list">
-                <li>Converse abertamente com seu líder sobre o que está travando.</li>
-                <li>Se decidir sair, saia de forma respeitosa e clara — sem contaminar o time.</li>
-            </ul>
-        </div>
-        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “Quero resolver, resistir ou me afastar?”</p></div>
-    </div>
-
-    <!-- 5. ACEITAÇÃO -->
-    <div class="estagio-card" id="aceitacao" data-aos="fade-right">
-        <div class="estagio-header">
-            <div class="estagio-icon"><i class="fa-solid fa-handshake"></i></div>
-            <div><h3>5. ACEITAÇÃO</h3><p>“Ok, vou tentar”</p></div>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
-            <ul class="estagio-list">
-                <li>Escolha 1 comportamento novo e pratique por uma semana.</li>
-                <li>Agradeça a si mesmo por estar tentando — mesmo com medo.</li>
-            </ul>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
-            <ul class="estagio-list">
-                <li>Faça o Desafio 7 dias (ex.: usar o sistema, seguir o novo fluxo).</li>
-                <li>Registre 1 coisa que deu certo e 1 que pode melhorar.</li>
-                <li>Compartilhe o aprendizado no grupo ou mural.</li>
-            </ul>
-        </div>
-        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que aprendi sobre mim quando tentei?”</p></div>
-    </div>
-
-    <!-- 6. DECISÃO -->
-    <div class="estagio-card" id="decisao" data-aos="fade-left">
-        <div class="estagio-header">
-            <div class="estagio-icon"><i class="fa-solid fa-bullseye"></i></div>
-            <div><h3>6. DECISÃO</h3><p>“Agora entendi como fazer”</p></div>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
-            <ul class="estagio-list">
-                <li>Ensine alguém o que você aprendeu.</li>
-                <li>Estabeleça uma nova rotina e mantenha.</li>
-                <li>Observe como sua confiança aumenta com o domínio.</li>
-            </ul>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
-            <ul class="estagio-list">
-                <li>Consulte o POP/checklist e veja se você já faz 100%.</li>
-                <li>Sugira uma melhoria prática.</li>
-                <li>Ofereça ajuda a quem ainda está em Incerteza ou Crise.</li>
-            </ul>
-        </div>
-        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “Como posso multiplicar o que aprendi?”</p></div>
-    </div>
-
-    <!-- 7. INTEGRAÇÃO -->
-    <div class="estagio-card" id="integracao" data-aos="fade-right">
-        <div class="estagio-header">
-            <div class="estagio-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
-            <div><h3>7. INTEGRAÇÃO</h3><p>“Agora é natural”</p></div>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
-            <ul class="estagio-list">
-                <li>Comemore: você integrou algo novo!</li>
-                <li>Olhe para trás e reconheça sua jornada.</li>
-                <li>Pense no próximo desafio: o que quero aprimorar agora?</li>
-            </ul>
-        </div>
-        <div class="estagio-section">
-            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
-            <ul class="estagio-list">
-                <li>Documente boas práticas do seu setor.</li>
-                <li>Crie 1 indicador simples de melhoria contínua.</li>
-                <li>Seja exemplo: mostre o caminho a quem ainda está subindo a curva.</li>
-            </ul>
-        </div>
-        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que posso ensinar para deixar o time ainda melhor?”</p></div>
-    </div>
-
-    <!-- BOTÃO VOLTAR -->
-    <div style="text-align:center;margin-top:40px">
-        <a href="#" class="btn-voltar" onclick="history.back()">Voltar ao Início</a>
-    </div>
-</div>
-
-<!-- RODAPÉ SIMPLES -->
-<footer>
-    <p>© 2024 BRASFORT | Rumo ao Novo. | <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;">Voltar ao topo</a></p>
-</footer>
-
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
-    // Progress bar
-    function updateProgressBar(){
-        const winScroll = document.body.scrollTop || document.documentElement.scrollTop,
-              height = document.documentElement.scrollHeight - document.documentElement.clientHeight,
-              scrolled = (winScroll / height) * 100;
-        document.getElementById('progressBar').style.width = scrolled + '%';
+  // ---------- ROTEIRO ----------
+  const roteiro = [
+    { q: 'Pra começar: você sente que entendeu bem o que está mudando e por quê?',
+      opts: [
+        { t: 'Ainda não, tô tentando entender.', p:0, feedback: 'Entendido. Começar pelo propósito ajuda: procure a documentação ou peça um resumo direto ao seu gestor.'},
+        { t: 'Entendo parte, mas ainda tenho dúvidas.', p:8, feedback: 'Bom sinal — você já absorveu parte da informação. Recomendo listar as dúvidas e buscar esclarecimentos objetivos.'},
+        { t: 'Sim — entendi o que mudou e por quê.', p:17, feedback: 'Ótimo. Entender o porquê reduz resistência e facilita decisões práticas no trabalho diário.'}
+      ]
+    },
+    { q: 'Mesmo com dúvidas, você toparia experimentar o novo jeito de trabalhar?',
+      opts: [
+        { t: 'Prefiro manter o jeito antigo por enquanto.', p:0, feedback: 'Compreendo. Se puder, defina um pequeno teste controlado para avaliar riscos antes de descartar a mudança.'},
+        { t: 'Tenho receio, mas estou tentando me adaptar.', p:8, feedback: 'Perfeito — adaptação gradual é eficiente. Registre o que deu certo para ajustar rapidamente.'},
+        { t: 'Sim! Estou curioso(a) e quero testar.', p:17, feedback: 'Excelente atitude. Curiosidade com critérios claros costuma gerar resultados rápidos e replicáveis.'}
+      ]
+    },
+    { q: 'E você já tentou aplicar algo diferente no seu dia a dia?',
+      opts: [
+        { t: 'Ainda não comecei.', p:0, feedback: 'Sem problema — sugerimos identificar uma tarefa simples para testar já nesta semana.'},
+        { t: 'Testei algo, mas só de vez em quando.', p:8, feedback: 'Ótimo começo. Faça registro breve dos resultados para ampliar o que funcionou.'},
+        { t: 'Já adaptei minha rotina e uso o novo.', p:17, feedback: 'Bom nível de engajamento — documente e padronize os passos que funcionam para replicar.'}
+      ]
+    },
+    { q: 'Quando aplica o novo formato, você se sente seguro(a)?',
+      opts: [
+        { t: 'Não sei aplicar direito ainda.', p:0, feedback: 'Recomendado: peça um walkthrough prático com um colega que já aplica — 15–30 minutos podem acelerar sua segurança.'},
+        { t: 'Consigo, mas às vezes fico com dúvida.', p:8, feedback: 'Normal. Criar um checklist reduz incertezas e aumenta a consistência da execução.'},
+        { t: 'Sim — aplico com segurança e clareza.', p:17, feedback: 'Excelente — considere registrar pontos de melhoria e compartilhar com o time.'}
+      ]
+    },
+    { q: 'Você já ajudou algum colega a entender esse novo jeito?',
+      opts: [
+        { t: 'Ainda não compartilhei.', p:0, feedback: 'Tudo bem — concentre-se em consolidar seu uso e depois compartilhe aprendizados simples.'},
+        { t: 'Já dei uma força, mas fiquei inseguro(a).', p:8, feedback: 'Bom — ao ensinar você consolida seu conhecimento. Use scripts ou passos claros para ganhar confiança.'},
+        { t: 'Sim — já orientei colegas com confiança.', p:17, feedback: 'Ótimo — seu papel como multiplicador é estratégico para a implementação em larga escala.'}
+      ]
+    },
+    { q: 'Hoje, o novo jeito já parece natural pra você?',
+      opts: [
+        { t: 'Prefiro o jeito antigo.', p:0, feedback: 'Entendo. Continue observando benefícios práticos; dados concretos costumam influenciar a decisão.'},
+        { t: 'Tô me acostumando, mas ainda exige esforço.', p:8, feedback: 'Progresso válido. Reduza o esforço dividindo a tarefa em passos menores até virar rotina.'},
+        { t: 'Já é natural — virou rotina.', p:17, feedback: 'Parabéns — integração efetiva é o objetivo. Continue aprimorando e apoiando colegas.'}
+      ]
     }
-    window.onscroll = updateProgressBar;
+  ];
 
-    // AOS + navegação do sumário + destaque ao rolar
-    document.addEventListener('DOMContentLoaded', () => {
-        AOS.init({ once: true, duration: 800 });
+  // ---------- ELEMENTOS ----------
+  const messages   = document.getElementById('messages');
+  const startBtn   = document.getElementById('startBtn');
+  const avatarBtn  = document.getElementById('avatarBtn');
+  const profileModal = document.getElementById('profileModal');
+  const callBtn    = document.getElementById('callBtn');
+  const videoBtn   = document.getElementById('videoBtn');
+  const backBtn    = document.getElementById('backBtn');
 
-        document.querySelectorAll('.summary-nav a').forEach(l => {
-            l.addEventListener('click', e => {
-                e.preventDefault();
-                const t = l.getAttribute('href'), el = document.querySelector(t),
-                      offset = 100, pos = el.getBoundingClientRect().top + window.pageYOffset - offset;
-                window.scrollTo({ top: pos, behavior: 'smooth' });
-                document.querySelectorAll('.summary-nav a').forEach(a => a.classList.remove('active'));
-                l.classList.add('active');
-            });
-        });
+  let index = 0, score = 0, maxScore = roteiro.length * 17, started = false;
+  let resultCard = null;          // guarda referência ao card de resultado
+  let tipsBubble = null;          // guarda referência à bolha de dicas (para rolagem)
 
-        window.addEventListener('scroll', () => {
-            let cur = '';
-            document.querySelectorAll('.estagio-card').forEach(c => {
-                if (c.getBoundingClientRect().top <= 150) cur = c.id;
-            });
-            document.querySelectorAll('.summary-nav a').forEach(a => {
-                a.classList.remove('active');
-                if (a.getAttribute('href') === `#${cur}`) a.classList.add('active');
-            });
-        });
+  // ---------- HELPERS ----------
+  function appendBubble(text, cls='bot', html=false){
+    const el = document.createElement('div');
+    el.className = 'bubble ' + cls;
+    if(html) el.innerHTML = text;
+    else el.textContent = text;
+    messages.appendChild(el);
+    messages.scrollTop = messages.scrollHeight;
+    return el;
+  }
+  function showTypingBubble(){
+    const t = document.createElement('div');
+    t.className = 'bubble bot typing';
+    t.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span> BIA está pensando...';
+    messages.appendChild(t);
+    messages.scrollTop = messages.scrollHeight;
+    return t;
+  }
+  function renderOptions(opts){
+    const container = document.createElement('div');
+    container.className = 'options';
+    opts.forEach(opt => {
+      const b = document.createElement('button');
+      b.className = 'opt';
+      b.textContent = opt.t;
+      b.onclick = () => selectOption(opt, container);
+      container.appendChild(b);
     });
+    messages.appendChild(container);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // ---------- SELEÇÃO ----------
+  function selectOption(opt, container){
+    appendBubble(opt.t, 'user');
+    score += opt.p;
+    container.remove();
+
+    const thinking = showTypingBubble();
+    const thinkingTime = 900 + Math.floor(Math.random()*900);
+    setTimeout(() => {
+      thinking.remove();
+      appendBubble(opt.feedback, 'bot');
+      index++;
+      if(index < roteiro.length){
+        setTimeout(() => askQuestion(index), 800);
+      } else {
+        setTimeout(showResultCard, 900);
+      }
+    }, thinkingTime);
+  }
+
+  function askQuestion(i){
+    const t = showTypingBubble();
+    const delay = 500 + Math.floor(Math.random()*600);
+    setTimeout(() => {
+      t.remove();
+      const q = roteiro[i];
+      appendBubble('<strong>'+ q.q +'</strong>', 'bot', true);
+      renderOptions(q.opts);
+    }, delay);
+  }
+
+  // ---------- INÍCIO ----------
+  function startConversation(){
+    messages.innerHTML = '';
+    index = 0; score = 0; started = true;
+    resultCard = null; tipsBubble = null;
+    startBtn.textContent = 'Reiniciar conversa';
+    startBtn.classList.add('restart');
+
+    appendBubble('<strong>Olá — aqui é a BIA (Brasfort IA).</strong>', 'bot', true);
+    appendBubble('Vou aplicar uma breve avaliação sobre sua adaptação à mudança. Responda as opções conforme achar mais adequado.', 'bot');
+    setTimeout(() => askQuestion(0), 900);
+  }
+
+  // ---------- RESULTADO ----------
+  function showResultCard(){
+    const percent = Math.min(Math.round((score / maxScore) * 100), 100);
+    let label = '', explanation = '', color = '', textColor = '#08304a';
+
+    if(percent <= 25){
+      label = 'Choque / Incerteza';
+      explanation = 'Com base nas suas respostas, você está em um momento inicial de assimilação. É comum sentir insegurança — priorize compreensão objetiva do propósito e apoio direto.';
+      color = '#fde2e2';
+      textColor = '#6b1e1e';
+    } else if(percent <= 50){
+      label = 'Negação / Crise';
+      explanation = 'Você demonstra resistência ou dúvidas. Foco em pequenas ações práticas e troca com colegas que já aplicam ajuda a reduzir a insegurança.';
+      color = '#fff4d6';
+      textColor = '#6b4900';
+    } else if(percent <= 75){
+      label = 'Aceitação / Decisão';
+      explanation = 'Você já está experimentando e tomando decisões para incorporar o novo. Continue praticando e consolidando rotinas para ganhar confiança.';
+      color = '#e6f7e9';
+      textColor = '#165c2b';
+    } else {
+      label = 'Integração';
+      explanation = 'Você integrou o novo em sua rotina e já serve como referência. Mantenha o suporte a colegas e fomente melhorias contínuas.';
+      color = '#dfeeff';
+      textColor = '#06314d';
+    }
+
+    // Card de resultado
+    resultCard = document.createElement('div');
+    resultCard.className = 'result-card';
+    resultCard.style.background = color;
+    resultCard.style.color = textColor;
+    resultCard.style.opacity = '0';
+    resultCard.style.transform = 'translateY(18px) scale(0.94)';
+    resultCard.style.transition = 'opacity .55s ease, transform .55s ease';
+    resultCard.innerHTML = `
+      <div class="stage-title">Estágio detectado — <strong>${label}</strong></div>
+      <div class="stage-desc">${explanation}</div>
+      <div class="actions-row">
+        <button class="action-btn action-whats" onclick="openWhats()">Falar com RH</button>
+        <button class="action-btn" id="showTipsBtn">Ver sugestões</button>
+      </div>
+    `;
+    messages.appendChild(resultCard);
+    messages.scrollTop = messages.scrollHeight;
+
+    // animação de entrada
+    requestAnimationFrame(() => {
+      resultCard.style.opacity = '1';
+      resultCard.style.transform = 'translateY(0) scale(1)';
+    });
+
+    // botão "Ver sugestões"
+    const showBtn = resultCard.querySelector('#showTipsBtn');
+    showBtn.onclick = () => {
+      if(tipsBubble) return; // já exibido
+
+      // mensagem de introdução
+      appendBubble('Minha sugestão prática — passos objetivos para avançar:', 'bot');
+
+      // lista de dicas
+      const tips = getTipsForStage(label);
+      const tipsHtml = `<ul style="margin:8px 0 0 18px; padding-left:18px;">` +
+                       tips.map(t => `<li style="margin-bottom:6px;">${t}</li>`).join('') +
+                       `</ul>`;
+      tipsBubble = appendBubble(tipsHtml, 'bot', true);
+
+      // mensagem final
+      appendBubble('Se preferir apoio humano, use o botão "Falar com RH" no card acima.', 'bot');
+
+      // remove o botão para evitar cliques repetidos
+      showBtn.style.display = 'none';
+    };
+
+    // garante botão de reiniciar
+    startBtn.textContent = 'Reiniciar conversa';
+    startBtn.classList.add('restart');
+  }
+
+  function getTipsForStage(label){
+    if(label === 'Choque / Incerteza'){
+      return [
+        'Peça um resumo objetivo do líder sobre os motivos da mudança.',
+        'Reserve 15 minutos para revisar documentação ou FAQs.',
+        'Anote 3 dúvidas e encaminhe ao RH ou líder.'
+      ];
+    }
+    if(label === 'Negação / Crise'){
+      return [
+        'Escolha uma pequena atividade para testar por 3 dias.',
+        'Converse com um colega que já aplicou o novo processo.',
+        'Registre o que deu certo e o que precisa de ajuste.'
+      ];
+    }
+    if(label === 'Aceitação / Decisão'){
+      return [
+        'Padronize os passos que deram certo para replicar.',
+        'Solicite feedback do seu líder sobre resultados iniciais.',
+        'Compartilhe um aprendizado com um colega esta semana.'
+      ];
+    }
+    return [
+      'Documente e compartilhe práticas bem-sucedidas com o time.',
+      'Lidere um mini-treino ou revisão de 15 minutos para colegas.',
+      'Proponha uma melhoria com base na sua experiência.'
+    ];
+  }
+
+  // ---------- EVENTOS ----------
+  startBtn.addEventListener('click', startConversation);
+  avatarBtn.addEventListener('click', () => {
+    profileModal.style.display = 'flex';
+    profileModal.setAttribute('aria-hidden', 'false');
+  });
+  window.closeModal = () => {
+    profileModal.style.display = 'none';
+    profileModal.setAttribute('aria-hidden', 'true');
+  };
+  callBtn.addEventListener('click', openWhats);
+  videoBtn.addEventListener('click', () => alert('Recurso de vídeo não está disponível no momento.'));
+  backBtn.addEventListener('click', () => history.back());
+
+  window.openWhats = () => window.open('https://wa.me/5561996050605', '_blank');
+  window.copyNumber = () => {
+    navigator.clipboard?.writeText('(61) 99605-0605');
+    alert('Número copiado: (61) 99605-0605');
+  };
+
+  // hint inicial
+  appendBubble('Toque em "Iniciar conversa" para iniciar a avaliação conduzida pela BIA.', 'bot');
 </script>
 </body>
 </html>
