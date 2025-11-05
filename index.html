@@ -176,7 +176,7 @@
               <div style="font-size:14px;color:#eef5ff;opacity:.95">
                 Brasfort Inteligência Artificial.
               </div>
-            
+           
               <button class="intro-cta" id="introStartBtn" style="display:inline-block">Iniciar</button>
             </div>
           </div>
@@ -219,363 +219,435 @@
   </div>
  
 <script>
-  // ---------- ROTEIRO (cada resposta com feedback estratégico) ----------
-  const roteiro = [
-    {
-      q: 'Pra começar: você sente que entendeu bem o que está mudando e por quê?',
-      opts: [
-        { t: 'Ainda não, tô tentando entender.', p:0, feedback: 'Entendido. Comece por solicitar um resumo conciso ao seu gestor e destaque as 3 dúvidas principais.'},
-        { t: 'Entendo parte, mas ainda tenho dúvidas.', p:8, feedback: 'Bom sinal — documente as dúvidas por tópico e peça esclarecimentos curtos e objetivos.'},
-        { t: 'Sim — entendi o que mudou e por quê.', p:17, feedback: 'Ótimo. Use esse entendimento para priorizar mudanças práticas no seu dia a dia.'}
-      ]
-    },
-    {
-      q: 'Mesmo com dúvidas, você toparia experimentar o novo jeito de trabalhar?',
-      opts: [
-        { t: 'Prefiro manter o jeito antigo por enquanto.', p:0, feedback: 'Compreendo. Sugiro definir um teste controlado para avaliar riscos sem comprometer tarefas críticas.'},
-        { t: 'Tenho receio, mas estou tentando me adaptar.', p:8, feedback: 'Certo — tente aplicar em tarefas de baixo impacto e registre aprendizados para ajustar.'},
-        { t: 'Sim! Estou curioso(a) e quero testar.', p:17, feedback: 'Perfeito — defina critérios objetivos para julgar o teste e repita quando aprovar.'}
-      ]
-    },
-    {
-      q: 'E você já tentou aplicar algo diferente no seu dia a dia?',
-      opts: [
-        { t: 'Ainda não comecei.', p:0, feedback: 'Sem problema — identifique uma tarefa simples esta semana e execute em modo de teste.'},
-        { t: 'Testei algo, mas só de vez em quando.', p:8, feedback: 'Bom começo. Faça um registro breve dos resultados para decidir se amplia a mudança.'},
-        { t: 'Já adaptei minha rotina e uso o novo.', p:17, feedback: 'Ótimo nível de engajamento — documente os passos que funcionam para replicar.'}
-      ]
-    },
-    {
-      q: 'Quando aplica o novo formato, você se sente seguro(a)?',
-      opts: [
-        { t: 'Não sei aplicar direito ainda.', p:0, feedback: 'Recomendado: peça um walkthrough (passo a passo) prático com um colega experiente — 15–30 minutos podem acelerar.'},
-        { t: 'Consigo, mas às vezes fico com dúvida.', p:8, feedback: 'Normal. Um checklist simples ajuda a reduzir a incerteza e padronizar a execução.'},
-        { t: 'Sim — aplico com segurança e clareza.', p:17, feedback: 'Excelente — registre pontos de melhoria e compartilhe com o time.'}
-      ]
-    },
-    {
-      q: 'Você já ajudou algum colega a entender esse novo jeito?',
-      opts: [
-        { t: 'Ainda não compartilhei.', p:0, feedback: 'Tudo bem — primeiro consolide seu conhecimento e depois compartilhe passos claros.'},
-        { t: 'Já dei uma força, mas fiquei inseguro(a).', p:8, feedback: 'Ao ensinar você solidifica seu aprendizado — prepare um roteiro curto para ganhar confiança.'},
-        { t: 'Sim — já orientei colegas com confiança.', p:17, feedback: 'Ótimo — seu papel como multiplicador é estratégico; continue apoiando o time.'}
-      ]
-    },
-    {
-      q: 'Hoje, o novo jeito já parece natural pra você?',
-      opts: [
-        { t: 'Prefiro o jeito antigo.', p:0, feedback: 'Entendo. Observe benefícios concretos por 1 semana para avaliar possíveis ganhos.'},
-        { t: 'Tô me acostumando, mas ainda exige esforço.', p:8, feedback: 'Progresso válido. Divida a tarefa até que os passos se tornem automáticos.'},
-        { t: 'Já é natural — virou rotina.', p:17, feedback: 'Parabéns — integração está ocorrendo. Considere apoiar colegas com pequenas sessões.'}
-      ]
-    }
-  ];
- 
-  // ---------- ELEMENTOS ----------
-  const messages = document.getElementById('messages');
-  const startBtn = document.getElementById('startBtn');
-  const introOverlay = document.getElementById('introOverlay');
-  const introStartBtn = document.getElementById('introStartBtn');
-  const brasfortTitle = document.getElementById('brasfortTitle');
-  const avatarBtn = document.getElementById('avatarBtn');
-  const profileModal = document.getElementById('profileModal');
-  const callBtn = document.getElementById('callBtn');
-  const videoBtn = document.getElementById('videoBtn');
-  const backBtn = document.getElementById('backBtn');
- 
-  let index = 0, score = 0, maxScore = roteiro.length * 17, started = false;
-  let resultCard = null, tipsBubble = null;
- 
-  // animate brasfort title: macro -> micro
-  (function animateTitle(){
-    brasfortTitle.style.transform = 'scale(2.6)';
-    brasfortTitle.style.opacity = '0';
-    setTimeout(()=> {
-      brasfortTitle.style.transition = 'transform 800ms cubic-bezier(.2,.9,.2,1), opacity 700ms';
-      brasfortTitle.style.transform = 'scale(1)';
-      brasfortTitle.style.opacity = '1';
-    }, 80);
-  })();
- 
-  // ---------- HELPERS ----------
-  function appendBubble(text, cls='bot', html=false){
-    const el = document.createElement('div');
-    el.className = 'bubble ' + cls;
-    if(html) el.innerHTML = text;
-    else el.textContent = text;
-    messages.appendChild(el);
-    messages.scrollTop = messages.scrollHeight;
-    return el;
-  }
- 
-  function showTypingBubble(messageLabel = 'BIA está pensando...'){
-    const t = document.createElement('div');
-    t.className = 'bubble bot typing';
-    t.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span> ' + messageLabel;
-    messages.appendChild(t);
-    messages.scrollTop = messages.scrollHeight;
-    return t;
-  }
- 
-  function renderOptions(opts){
-    const container = document.createElement('div');
-    container.className = 'options';
-    opts.forEach((opt)=>{
-      const b = document.createElement('button');
-      b.className = 'opt';
-      b.textContent = opt.t;
-      b.onclick = ()=> selectOption(opt, container);
-      container.appendChild(b);
-    });
-    messages.appendChild(container);
-    messages.scrollTop = messages.scrollHeight;
-    return container;
-  }
- 
-  // ---------- SELEÇÃO ----------
-  function selectOption(opt, container){
-    appendBubble(opt.t, 'user');
-    score += opt.p;
-    container.remove();
- 
-    const thinking = showTypingBubble();
-    const thinkingTime = 900 + Math.floor(Math.random()*900);
-    setTimeout(()=> {
-      thinking.remove();
-      appendBubble(opt.feedback, 'bot');
- 
-      index++;
-      if(index < roteiro.length){
-        setTimeout(()=> askQuestion(index), 800);
-      } else {
-        setTimeout(showResultCard, 900);
+    // ----------------------------------------------------------------------
+    // [CONFIGURAÇÃO DE BACK-END] - AJUSTE DA URL E VARIÁVEIS DE RASTREIO
+    // ----------------------------------------------------------------------
+
+    // ⚠️ SUA URL DA API - JÁ AJUSTADA COM BASE NO QUE VOCÊ FORNECEU
+    const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHg43ly-AQUA9EXoThj4SIhdUARfLAf6TWw-z6k1wYdrN71muzjfa2YxHeNa8Wmyus/exec';
+    
+    let sessionResponses = []; 
+    
+    // FUNÇÃO PARA GERAR UM ID ÚNICO E PERSISTENTE (USANDO localStorage)
+    function getDeviceId() {
+      let deviceId = localStorage.getItem('brasfort_device_id');
+      if (!deviceId) {
+        // Gera um UUID simples (evitando bibliotecas externas)
+        deviceId = 'ID-' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+        localStorage.setItem('brasfort_device_id', deviceId);
       }
-    }, thinkingTime);
-  }
- 
-  function askQuestion(i){
-    const t = showTypingBubble('BIA está preparando a próxima pergunta...');
-    const delay = 500 + Math.floor(Math.random()*600);
-    setTimeout(()=> {
-      t.remove();
-      const q = roteiro[i];
-      appendBubble('<strong>'+ q.q +'</strong>', 'bot', true);
-      renderOptions(q.opts);
-    }, delay);
-  }
- 
-  // ---------- INICIO DA CONVERSA ----------
-  function startConversation(){
-    // hide intro overlay (if visible)
-    if(introOverlay && introOverlay.style.display !== 'none') {
-      introOverlay.style.display = 'none';
-      introOverlay.setAttribute('aria-hidden','true');
+      return deviceId;
     }
- 
-    // reset
-    messages.innerHTML = '';
-    index = 0; score = 0; started = true; resultCard = null; tipsBubble = null;
-    startBtn.textContent = 'Reiniciar conversa';
-    startBtn.classList.add('restart');
- 
-    // initial BIA intro as chat message (with typing)
-    const t = showTypingBubble('BIA está iniciando a avaliação...');
-    setTimeout(()=> {
-      t.remove();
-      appendBubble('Olá — sou a BIA, Inteligência Artificial da Brasfort.'); // intro short
-      appendBubble('Vou aplicar uma breve avaliação sobre sua adaptação à mudança. Responda as opções conforme achar mais adequado.'); // instruction
-      setTimeout(()=> askQuestion(0), 900);
-    }, 1000);
-  }
- 
-  // ---------- RESULTADO (CARD COLORIDO + MENSAGEM DE ORIENTAÇÃO) ----------
-  function showResultCard(){
-    const percent = Math.min(Math.round((score / maxScore) * 100), 100);
-    let label='', explanation='', color='', textColor='#08304a';
- 
-    if(percent <= 25){
-      label = 'Choque / Incerteza';
-      explanation = 'Com base nas suas respostas, você está no começo do processo de assimilação. Priorize compreensão objetiva do propósito e peça apoio direto.';
-      color = 'var(--card-red)';
-      textColor = '#6b1e1e';
-    } else if(percent <= 50){
-      label = 'Negação / Crise';
-      explanation = 'Você demonstra resistência ou dúvidas. Foque em ações pequenas e aprendizado com colegas que já aplicam.';
-      color = 'var(--card-yellow)';
-      textColor = '#6b4900';
-    } else if(percent <= 75){
-      label = 'Aceitação / Decisão';
-      explanation = 'Você está experimentando e aprendendo. Continue consolidando rotinas para ganhar confiança e consistência.';
-      color = 'var(--card-green)';
-      textColor = '#165c2b';
-    } else {
-      label = 'Integração';
-      explanation = 'Você incorporou o novo e já serve de referência. Mantenha o suporte a colegas e proponha melhorias contínuas.';
-      color = 'var(--card-blue)';
-      textColor = '#06314d';
-    }
- 
-    // create card
-    resultCard = document.createElement('div');
-    resultCard.className = 'result-card';
-    resultCard.style.background = color;
-    resultCard.style.color = textColor;
-    resultCard.innerHTML = `
-      <div class="stage-title">Estágio detectado — <strong>${label}</strong></div>
-      <div class="stage-desc">${explanation}</div>
-      <!-- BOTÕES DE AÇÃO -->
-      <div class="action-buttons">
-        <button class="action-btn action-whats" onclick="openWhatsApp()">💬 Falar com RH</button>
-        <button class="action-btn" onclick="showSuggestions()">💡 Ver sugestões</button>
-      </div>
-    `;
-    messages.appendChild(resultCard);
-    messages.scrollTop = messages.scrollHeight;
- 
-    // animate in
-    requestAnimationFrame(()=> {
-      resultCard.style.opacity = '1';
-      resultCard.style.transform = 'translateY(0) scale(1)';
-    });
- 
-    // ensure restart button state
-    startBtn.textContent = 'Reiniciar conversa';
-    startBtn.classList.add('restart');
-  }
- 
-  function getTipsForStage(label){
-    if(label === 'Choque / Incerteza'){
-      return [
-        'Peça um resumo objetivo ao líder sobre os motivos da mudança.',
-        'Reserve 15 minutos para revisar a documentação essencial.',
-        'Liste 3 dúvidas e encaminhe ao seu gestor ou RH.'
-      ];
-    }
-    if(label === 'Negação / Crise'){
-      return [
-        'Escolha uma atividade pequena para testar por 3 dias.',
-        'Converse com um colega que já adotou o novo processo.',
-        'Registre resultados simples: o que funcionou e o que ajustar.'
-      ];
-    }
-    if(label === 'Aceitação / Decisão'){
-      return [
-        'Padronize passos que deram certo para replicar.',
-        'Peça feedback do líder sobre suas práticas iniciais.',
-        'Compartilhe um aprendizado com um colega esta semana.'
-      ];
-    }
-    return [
-      'Documente e compartilhe práticas bem-sucedidas com o time.',
-      'Organize um microtreino de 15 minutos para colegas.',
-      'Proponha uma melhoria com base na sua experiência prática.'
-    ];
-  }
- 
-  // ---------- HANDLERS ----------
-  // start via intro button
-  introStartBtn.addEventListener('click', startConversation);
-  // footer start button behavior
-  startBtn.addEventListener('click', () => {
-    // if intro still visible, hide and start; else simply restart
-    if(introOverlay && introOverlay.style.display !== 'none') {
-      startConversation();
-    } else {
-      startConversation();
-    }
-  });
- 
-  // profile modal
-  avatarBtn.addEventListener('click', () => {
-    profileModal.style.display = 'flex';
-    profileModal.setAttribute('aria-hidden','false');
-  });
-  window.closeModal = () => {
-    profileModal.style.display = 'none';
-    profileModal.setAttribute('aria-hidden','true');
-  };
- 
-  // call / video / back
-  callBtn.addEventListener('click', openWhatsApp);
-  videoBtn.addEventListener('click', openWhatsApp);
-  backBtn.addEventListener('click', () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.reload();
-    }
-  });
- 
-  // utilities exposed for buttons
-  window.copyNumber = () => {
-    const number = '(61) 99605-0605';
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(number).then(() => {
-        alert('Número copiado: ' + number);
-      }).catch(() => {
-        // Fallback para navegadores mais antigos
-        const textArea = document.createElement('textarea');
-        textArea.value = number;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-          document.execCommand('copy');
-          alert('Número copiado: ' + number);
-        } catch (err) {
-          alert('Falha ao copiar. Número: ' + number);
+    const currentDeviceId = getDeviceId(); // Captura o ID do dispositivo/usuário no carregamento
+    
+    // ----------------------------------------------------------------------
+    // [FIM DA CONFIGURAÇÃO DE BACK-END]
+    // ----------------------------------------------------------------------
+
+    // ---------- ROTEIRO (cada resposta com feedback estratégico) ----------
+    const roteiro = [
+        {
+            q: 'Pra começar: você sente que entendeu bem o que está mudando e por quê?',
+            opts: [
+                { t: 'Ainda não, tô tentando entender.', p:0, feedback: 'Entendido. Comece por solicitar um resumo conciso ao seu gestor e destaque as 3 dúvidas principais.'},
+                { t: 'Entendo parte, mas ainda tenho dúvidas.', p:8, feedback: 'Bom sinal — documente as dúvidas por tópico e peça esclarecimentos curtos e objetivos.'},
+                { t: 'Sim — entendi o que mudou e por quê.', p:17, feedback: 'Ótimo. Use esse entendimento para priorizar mudanças práticas no seu dia a dia.'}
+            ]
+        },
+        {
+            q: 'Mesmo com dúvidas, você toparia experimentar o novo jeito de trabalhar?',
+            opts: [
+                { t: 'Prefiro manter o jeito antigo por enquanto.', p:0, feedback: 'Compreendo. Sugiro definir um teste controlado para avaliar riscos sem comprometer tarefas críticas.'},
+                { t: 'Tenho receio, mas estou tentando me adaptar.', p:8, feedback: 'Certo — tente aplicar em tarefas de baixo impacto e registre aprendizados para ajustar.'},
+                { t: 'Sim! Estou curioso(a) e quero testar.', p:17, feedback: 'Perfeito — defina critérios objetivos para julgar o teste e repita quando aprovar.'}
+            ]
+        },
+        {
+            q: 'E você já tentou aplicar algo diferente no seu dia a dia?',
+            opts: [
+                { t: 'Ainda não comecei.', p:0, feedback: 'Sem problema — identifique uma tarefa simples esta semana e execute em modo de teste.'},
+                { t: 'Testei algo, mas só de vez em quando.', p:8, feedback: 'Bom começo. Faça um registro breve dos resultados para decidir se amplia a mudança.'},
+                { t: 'Já adaptei minha rotina e uso o novo.', p:17, feedback: 'Ótimo nível de engajamento — documente os passos que funcionam para replicar.'}
+            ]
+        },
+        {
+            q: 'Quando aplica o novo formato, você se sente seguro(a)?',
+            opts: [
+                { t: 'Não sei aplicar direito ainda.', p:0, feedback: 'Recomendado: peça um walkthrough (passo a passo) prático com um colega experiente — 15–30 minutos podem acelerar.'},
+                { t: 'Consigo, mas às vezes fico com dúvida.', p:8, feedback: 'Normal. Um checklist simples ajuda a reduzir a incerteza e padronizar a execução.'},
+                { t: 'Sim — aplico com segurança e clareza.', p:17, feedback: 'Excelente — registre pontos de melhoria e compartilhe com o time.'}
+            ]
+        },
+        {
+            q: 'Você já ajudou algum colega a entender esse novo jeito?',
+            opts: [
+                { t: 'Ainda não compartilhei.', p:0, feedback: 'Tudo bem — primeiro consolide seu conhecimento e depois compartilhe passos claros.'},
+                { t: 'Já dei uma força, mas fiquei inseguro(a).', p:8, feedback: 'Ao ensinar você solidifica seu aprendizado — prepare um roteiro curto para ganhar confiança.'},
+                { t: 'Sim — já orientei colegas com confiança.', p:17, feedback: 'Ótimo — seu papel como multiplicador é estratégico; continue apoiando o time.'}
+            ]
+        },
+        {
+            q: 'Hoje, o novo jeito já parece natural pra você?',
+            opts: [
+                { t: 'Prefiro o jeito antigo.', p:0, feedback: 'Entendo. Observe benefícios concretos por 1 semana para avaliar possíveis ganhos.'},
+                { t: 'Tô me acostumando, mas ainda exige esforço.', p:8, feedback: 'Progresso válido. Divida a tarefa até que os passos se tornem automáticos.'},
+                { t: 'Já é natural — virou rotina.', p:17, feedback: 'Parabéns — integração está ocorrendo. Considere apoiar colegas com pequenas sessões.'}
+            ]
         }
-        document.body.removeChild(textArea);
-      });
-    } else {
-      // Fallback antigo
-      const textArea = document.createElement('textarea');
-      textArea.value = number;
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        alert('Número copiado: ' + number);
-      } catch (err) {
-        alert('Falha ao copiar. Número: ' + number);
-      }
-      document.body.removeChild(textArea);
+    ];
+
+    // ---------- ELEMENTOS ----------
+    const messages = document.getElementById('messages');
+    const startBtn = document.getElementById('startBtn');
+    const introOverlay = document.getElementById('introOverlay');
+    const introStartBtn = document.getElementById('introStartBtn');
+    const brasfortTitle = document.getElementById('brasfortTitle');
+    const avatarBtn = document.getElementById('avatarBtn');
+    const profileModal = document.getElementById('profileModal');
+    const callBtn = document.getElementById('callBtn');
+    const videoBtn = document.getElementById('videoBtn');
+    const backBtn = document.getElementById('backBtn');
+
+    let index = 0, score = 0, maxScore = roteiro.length * 17, started = false;
+    let resultCard = null, tipsBubble = null;
+
+    // animate brasfort title: macro -> micro
+    (function animateTitle(){
+        brasfortTitle.style.transform = 'scale(2.6)';
+        brasfortTitle.style.opacity = '0';
+        setTimeout(()=> {
+            brasfortTitle.style.transition = 'transform 800ms cubic-bezier(.2,.9,.2,1), opacity 700ms';
+            brasfortTitle.style.transform = 'scale(1)';
+            brasfortTitle.style.opacity = '1';
+        }, 80);
+    })();
+
+    // ---------- HELPERS ----------
+    function appendBubble(text, cls='bot', html=false){
+        const el = document.createElement('div');
+        el.className = 'bubble ' + cls;
+        if(html) el.innerHTML = text;
+        else el.textContent = text;
+        messages.appendChild(el);
+        messages.scrollTop = messages.scrollHeight;
+        return el;
     }
-  };
-  window.showSuggestions = () => {
-    if(tipsBubble) return;
-    appendBubble('Minha sugestão prática — passos objetivos para avançar:', 'bot');
-    const label = resultCard.querySelector('.stage-title strong').textContent;
-    const tips = getTipsForStage(label);
-    const tipsHtml = `<ul style="margin:8px 0 0 18px; padding-left:18px;">` +
-                     tips.map(t => `<li style="margin-bottom:6px;">${t}</li>`).join('') +
-                     `</ul>`;
-    tipsBubble = appendBubble(tipsHtml, 'bot', true);
-    appendBubble('Se preferir apoio humano, use o botão "Falar com RH" no card acima.', 'bot');
-    const btn = resultCard.querySelector('button[onclick="showSuggestions()"]');
-    if (btn) btn.style.display = 'none';
-  };
-  // Nova função openWhatsApp() - evita COOP com link dinâmico
-  function openWhatsApp() {
-    const phone = "5561996050605";
-    const message = encodeURIComponent("Olá, equipe de RH! Acabei de concluir minha avaliação de adaptação à mudança com a BIA e gostaria de conversar sobre os resultados.");
-    const url = `https://wa.me/${phone}?text=${message}`;
-    // Cria um link invisível e simula clique (bypassa window.open)
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer'; // Segurança: não permite opener
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
- 
-  // initial tiny intro inside chat as fallback (will be removed when introOverlay used)
-  (function initialIntroFallback(){
-    // placeholder message will be replaced when the user starts via intro overlay
-    // but keep small hint in case overlay blocked
-    appendBubble('Toque em "Começar agora" para iniciar a avaliação conduzida pela BIA.', 'bot');
-  })();
+
+    function showTypingBubble(messageLabel = 'BIA está pensando...'){
+        const t = document.createElement('div');
+        t.className = 'bubble bot typing';
+        t.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span> ' + messageLabel;
+        messages.appendChild(t);
+        messages.scrollTop = messages.scrollHeight;
+        return t;
+    }
+
+    function renderOptions(opts){
+        const container = document.createElement('div');
+        container.className = 'options';
+        opts.forEach((opt)=>{
+            const b = document.createElement('button');
+            b.className = 'opt';
+            b.textContent = opt.t;
+            b.onclick = ()=> selectOption(opt, container);
+            container.appendChild(b);
+        });
+        messages.appendChild(container);
+        messages.scrollTop = messages.scrollHeight;
+        return container;
+    }
+
+    // ---------- SELEÇÃO (Com Coleta de Dados) ----------
+    function selectOption(opt, container){
+        appendBubble(opt.t, 'user');
+
+        // LÓGICA DE COLETA DE DADOS: registra a resposta antes de avançar
+        const currentQuestion = roteiro[index].q;
+        sessionResponses.push({
+            pergunta: currentQuestion,
+            resposta: opt.t, 
+            pontos: opt.p,
+            feedback: opt.feedback,
+            timestamp_resposta: new Date().toISOString() // Captura o tempo da resposta
+        });
+        
+        score += opt.p;
+        container.remove();
+
+        const thinking = showTypingBubble();
+        const thinkingTime = 900 + Math.floor(Math.random()*900);
+        setTimeout(()=> {
+            thinking.remove();
+            appendBubble(opt.feedback, 'bot');
+
+            index++;
+            if(index < roteiro.length){
+                setTimeout(()=> askQuestion(index), 800);
+            } else {
+                setTimeout(showResultCard, 900);
+            }
+        }, thinkingTime);
+    }
+
+    function askQuestion(i){
+        const t = showTypingBubble('BIA está preparando a próxima pergunta...');
+        const delay = 500 + Math.floor(Math.random()*600);
+        setTimeout(()=> {
+            t.remove();
+            const q = roteiro[i];
+            appendBubble('<strong>'+ q.q +'</strong>', 'bot', true);
+            renderOptions(q.opts);
+        }, delay);
+    }
+    
+    // ---------- ENVIO DE DADOS (Nova Função) ----------
+    function sendDataToServer(deviceId, finalPercent, finalStage) {
+        if (GOOGLE_APP_SCRIPT_URL === 'SUA_URL_DA_API_AQUI') {
+            console.error('⚠️ URL da API não configurada corretamente. Dados não serão salvos.');
+            return;
+        }
+
+        const payload = {
+            deviceId: deviceId,
+            data_preenchimento: new Date().toISOString(),
+            estagio_final: finalStage,
+            percentual: finalPercent,
+            respostas: sessionResponses // Array de todas as respostas detalhadas
+        };
+
+        // Usa fetch para enviar os dados
+        fetch(GOOGLE_APP_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Modo necessário para Apps Script
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            console.log('Dados enviados ao servidor (verifique o Google Sheets).');
+        })
+        .catch((error) => {
+            console.error('Erro ao tentar enviar dados:', error);
+        });
+    }
+
+
+    // ---------- INICIO DA CONVERSA ----------
+    function startConversation(){
+        // hide intro overlay (if visible)
+        if(introOverlay && introOverlay.style.display !== 'none') {
+            introOverlay.style.display = 'none';
+            introOverlay.setAttribute('aria-hidden','true');
+        }
+
+        // reset
+        messages.innerHTML = '';
+        index = 0; score = 0; started = true; resultCard = null; tipsBubble = null;
+        sessionResponses = []; // Limpa as respostas antigas ao reiniciar
+        startBtn.textContent = 'Reiniciar conversa';
+        startBtn.classList.add('restart');
+
+        // initial BIA intro as chat message (with typing)
+        const t = showTypingBubble('BIA está iniciando a avaliação...');
+        setTimeout(()=> {
+            t.remove();
+            appendBubble('Olá — sou a BIA, Inteligência Artificial da Brasfort.'); // intro short
+            appendBubble('Vou aplicar uma breve avaliação sobre sua adaptação à mudança. Responda as opções conforme achar mais adequado.'); // instruction
+            setTimeout(()=> askQuestion(0), 900);
+        }, 1000);
+    }
+
+    // ---------- RESULTADO (CARD COLORIDO + MENSAGEM DE ORIENTAÇÃO, AGORA SALVA DADOS) ----------
+    function showResultCard(){
+        const percent = Math.min(Math.round((score / maxScore) * 100), 100);
+        let label='', explanation='', color='', textColor='#08304a';
+
+        if(percent <= 25){
+            label = 'Choque / Incerteza';
+            explanation = 'Com base nas suas respostas, você está no começo do processo de assimilação. Priorize compreensão objetiva do propósito e peça apoio direto.';
+            color = 'var(--card-red)';
+            textColor = '#6b1e1e';
+        } else if(percent <= 50){
+            label = 'Negação / Crise';
+            explanation = 'Você demonstra resistência ou dúvidas. Foque em ações pequenas e aprendizado com colegas que já aplicam.';
+            color = 'var(--card-yellow)';
+            textColor = '#6b4900';
+        } else if(percent <= 75){
+            label = 'Aceitação / Decisão';
+            explanation = 'Você está experimentando e aprendendo. Continue consolidando rotinas para ganhar confiança e consistência.';
+            color = 'var(--card-green)';
+            textColor = '#165c2b';
+        } else {
+            label = 'Integração';
+            explanation = 'Você incorporou o novo e já serve de referência. Mantenha o suporte a colegas e proponha melhorias contínuas.';
+            color = 'var(--card-blue)';
+            textColor = '#06314d';
+        }
+        
+        // ⚠️ CHAMADA PARA SALVAR OS DADOS NO SERVIDOR ANTES DE EXIBIR O CARD
+        sendDataToServer(currentDeviceId, percent, label); 
+
+        // create card
+        resultCard = document.createElement('div');
+        resultCard.className = 'result-card';
+        resultCard.style.background = color;
+        resultCard.style.color = textColor;
+        resultCard.innerHTML = `
+            <div class="stage-title">Estágio detectado — <strong>${label}</strong></div>
+            <div class="stage-desc">${explanation}</div>
+            <div class="action-buttons">
+                <button class="action-btn action-whats" onclick="openWhatsApp()">💬 Falar com RH</button>
+                <button class="action-btn" onclick="showSuggestions()">💡 Ver sugestões</button>
+            </div>
+        `;
+        messages.appendChild(resultCard);
+        messages.scrollTop = messages.scrollHeight;
+
+        // animate in
+        requestAnimationFrame(()=> {
+            resultCard.style.opacity = '1';
+            resultCard.style.transform = 'translateY(0) scale(1)';
+        });
+
+        // ensure restart button state
+        startBtn.textContent = 'Reiniciar conversa';
+        startBtn.classList.add('restart');
+    }
+
+    function getTipsForStage(label){
+        if(label === 'Choque / Incerteza'){
+            return [
+                'Peça um resumo objetivo ao líder sobre os motivos da mudança.',
+                'Reserve 15 minutos para revisar a documentação essencial.',
+                'Liste 3 dúvidas e encaminhe ao seu gestor ou RH.'
+            ];
+        }
+        if(label === 'Negação / Crise'){
+            return [
+                'Escolha uma atividade pequena para testar por 3 dias.',
+                'Converse com um colega que já adotou o novo processo.',
+                'Registre resultados simples: o que funcionou e o que ajustar.'
+            ];
+        }
+        if(label === 'Aceitação / Decisão'){
+            return [
+                'Padronize passos que deram certo para replicar.',
+                'Peça feedback do líder sobre suas práticas iniciais.',
+                'Compartilhe um aprendizado com um colega esta semana.'
+            ];
+        }
+        return [
+            'Documente e compartilhe práticas bem-sucedidas com o time.',
+            'Organize um microtreino de 15 minutos para colegas.',
+            'Proponha uma melhoria com base na sua experiência prática.'
+        ];
+    }
+
+    // ---------- HANDLERS ----------
+    // start via intro button
+    introStartBtn.addEventListener('click', startConversation);
+    // footer start button behavior
+    startBtn.addEventListener('click', () => {
+        // if intro still visible, hide and start; else simply restart
+        if(introOverlay && introOverlay.style.display !== 'none') {
+            startConversation();
+        } else {
+            startConversation();
+        }
+    });
+
+    // profile modal
+    avatarBtn.addEventListener('click', () => {
+        profileModal.style.display = 'flex';
+        profileModal.setAttribute('aria-hidden','false');
+    });
+    window.closeModal = () => {
+        profileModal.style.display = 'none';
+        profileModal.setAttribute('aria-hidden','true');
+    };
+
+    // call / video / back
+    callBtn.addEventListener('click', openWhatsApp);
+    videoBtn.addEventListener('click', openWhatsApp);
+    backBtn.addEventListener('click', () => {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.reload();
+        }
+    });
+
+    // utilities exposed for buttons
+    window.copyNumber = () => {
+        const number = '(61) 99605-0605';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(number).then(() => {
+                alert('Número copiado: ' + number);
+            }).catch(() => {
+                // Fallback para navegadores mais antigos
+                const textArea = document.createElement('textarea');
+                textArea.value = number;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('Número copiado: ' + number);
+                } catch (err) {
+                    alert('Falha ao copiar. Número: ' + number);
+                }
+                document.body.removeChild(textArea);
+            });
+        } else {
+            // Fallback antigo
+            const textArea = document.createElement('textarea');
+            textArea.value = number;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('Número copiado: ' + number);
+            } catch (err) {
+                alert('Falha ao copiar. Número: ' + number);
+            }
+            document.body.removeChild(textArea);
+        }
+    };
+    window.showSuggestions = () => {
+        if(tipsBubble) return;
+        appendBubble('Minha sugestão prática — passos objetivos para avançar:', 'bot');
+        const label = resultCard.querySelector('.stage-title strong').textContent;
+        const tips = getTipsForStage(label);
+        const tipsHtml = `<ul style="margin:8px 0 0 18px; padding-left:18px;">` +
+                            tips.map(t => `<li style="margin-bottom:6px;">${t}</li>`).join('') +
+                            `</ul>`;
+        tipsBubble = appendBubble(tipsHtml, 'bot', true);
+        appendBubble('Se preferir apoio humano, use o botão "Falar com RH" no card acima.', 'bot');
+        const btn = resultCard.querySelector('button[onclick="showSuggestions()"]');
+        if (btn) btn.style.display = 'none';
+    };
+    // Nova função openWhatsApp() - evita COOP com link dinâmico
+    function openWhatsApp() {
+        const phone = "5561996050605";
+        const message = encodeURIComponent("Olá, equipe de RH! Acabei de concluir minha avaliação de adaptação à mudança com a BIA e gostaria de conversar sobre os resultados.");
+        const url = `https://wa.me/${phone}?text=${message}`;
+        // Cria um link invisível e simula clique (bypassa window.open)
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer'; // Segurança: não permite opener
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // initial tiny intro inside chat as fallback (will be removed when introOverlay used)
+    (function initialIntroFallback(){
+        // placeholder message will be replaced when the user starts via intro overlay
+        // but keep small hint in case overlay blocked
+        appendBubble('Toque em "Começar agora" para iniciar a avaliação conduzida pela BIA.', 'bot');
+    })();
 </script>
 </body>
 </html>
