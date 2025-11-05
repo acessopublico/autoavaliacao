@@ -239,6 +239,27 @@
       return deviceId;
     }
     const currentDeviceId = getDeviceId(); // Captura o ID do dispositivo/usuário no carregamento
+
+    // Função utilitária para obter timestamp em horário de Brasília (ISO-like com offset -03:00)
+    function getBrasiliaISOString(now = new Date()) {
+      const formatter = new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'America/Sao_Paulo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        fractionalSecondDigits: 3,
+        hourCycle: 'h23'
+      });
+      const parts = formatter.formatToParts(now);
+      let isoString = '';
+      for (let part of parts) {
+        isoString += part.value;
+      }
+      return isoString + '-03:00'; // Fuso fixo de Brasília (sem horário de verão desde 2019)
+    }
     
     // ----------------------------------------------------------------------
     // [FIM DA CONFIGURAÇÃO DE BACK-END]
@@ -368,7 +389,7 @@
             resposta: opt.t, 
             pontos: opt.p,
             feedback: opt.feedback,
-            timestamp_resposta: new Date().toISOString() // Captura o tempo da resposta
+            timestamp_resposta: getBrasiliaISOString() // Substituído: usa horário de Brasília
         });
         
         score += opt.p;
@@ -409,7 +430,7 @@
 
         const payload = {
             deviceId: deviceId,
-            data_preenchimento: new Date().toISOString(),
+            data_preenchimento: getBrasiliaISOString(), // Substituído: usa horário de Brasília
             estagio_final: finalStage,
             percentual: finalPercent,
             respostas: sessionResponses // Array de todas as respostas detalhadas
