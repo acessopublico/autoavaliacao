@@ -24,10 +24,21 @@
     }
     html,body{height:100%;margin:0;font-family:var(--font);background:linear-gradient(180deg,var(--bg-start) 0%, #eef4fb 100%);color:#17324a}
     /* layout */
-    .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+    .stage{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:0 18px 18px 18px}
     .app{width:100%;max-width:calc(var(--chat-width) + 320px);display:flex;gap:20px;align-items:flex-start;justify-content:center;position:relative}
     /* phone mock */
-    .phone{width:var(--chat-width);background:var(--glass);border-radius:18px;box-shadow:0 18px 35px rgba(16,40,80,0.12);overflow:hidden;border:1px solid rgba(10,30,70,0.06);height:88vh;display:flex;flex-direction:column;position:relative}
+    .phone{
+  width:var(--chat-width);
+  background:var(--glass);
+  border-radius:0 0 18px 18px; /* 🔵 Só as bordas de baixo arredondadas */
+  box-shadow:0 18px 35px rgba(16,40,80,0.12);
+  overflow:hidden;
+  border:none; /* 🔵 remove a linha branca em volta */
+  height:100vh; /* 🔵 ocupa toda a altura da tela */
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
     /* header fixed */
     .header{background:linear-gradient(90deg,var(--brand) 0%, var(--brand-dark) 100%);color:#fff;padding:10px 12px 10px 12px;display:flex;align-items:center;gap:10px;flex:0 0 var(--header-height);position:relative;border-radius: var(--radius) var(--radius) 0 0;}
     .back-btn{width:40px;height:40px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,255,255,0.12);cursor:pointer;margin-right:6px;flex:0 0 40px;transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
@@ -114,7 +125,7 @@
     .intro-cta:active{transform: scale(0.95);}
     .intro-small{font-size:13px;opacity:.9;margin-top:10px}
     /* responsive */
-    @media(max-width:900px){.app{flex-direction:column;align-items:center}.side{display:none}.phone{height:94vh;width:96vw}}
+    @media(max-width:900px){.app{flex-direction:column;align-items:center}.side{display:none}.phone{height:100vh;width:100%}}
   </style>
 </head>
 <body>
@@ -165,7 +176,7 @@
               <div style="font-size:14px;color:#eef5ff;opacity:.95">
                 Brasfort Inteligência Artificial.
               </div>
-             
+            
               <button class="intro-cta" id="introStartBtn" style="display:inline-block">Iniciar</button>
             </div>
           </div>
@@ -530,7 +541,6 @@
       document.body.removeChild(textArea);
     }
   };
-
   window.showSuggestions = () => {
     if(tipsBubble) return;
     appendBubble('Minha sugestão prática — passos objetivos para avançar:', 'bot');
@@ -544,18 +554,16 @@
     const btn = resultCard.querySelector('button[onclick="showSuggestions()"]');
     if (btn) btn.style.display = 'none';
   };
-
   // Nova função openWhatsApp() - evita COOP com link dinâmico
   function openWhatsApp() {
     const phone = "5561996050605";
     const message = encodeURIComponent("Olá, equipe de RH! Acabei de concluir minha avaliação de adaptação à mudança com a BIA e gostaria de conversar sobre os resultados.");
     const url = `https://wa.me/${phone}?text=${message}`;
-
     // Cria um link invisível e simula clique (bypassa window.open)
     const link = document.createElement('a');
     link.href = url;
     link.target = '_blank';
-    link.rel = 'noopener noreferrer';  // Segurança: não permite opener
+    link.rel = 'noopener noreferrer'; // Segurança: não permite opener
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
