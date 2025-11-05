@@ -29,16 +29,20 @@
     /* phone mock */
     .phone{width:var(--chat-width);background:var(--glass);border-radius:18px;box-shadow:0 18px 35px rgba(16,40,80,0.12);overflow:hidden;border:1px solid rgba(10,30,70,0.06);height:88vh;display:flex;flex-direction:column;position:relative}
     /* header fixed */
-    .header{background:linear-gradient(90deg,var(--brand) 0%, var(--brand-dark) 100%);color:#fff;padding:10px 12px 10px 12px;display:flex;align-items:center;gap:10px;flex:0 0 var(--header-height);position:relative}
-    .back-btn{width:40px;height:40px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,255,255,0.12);cursor:pointer;margin-right:6px;flex:0 0 40px}
-    .avatar{width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.14);flex:0 0 48px;cursor:pointer}
+    .header{background:linear-gradient(90deg,var(--brand) 0%, var(--brand-dark) 100%);color:#fff;padding:10px 12px 10px 12px;display:flex;align-items:center;gap:10px;flex:0 0 var(--header-height);position:relative;border-radius: var(--radius) var(--radius) 0 0;}
+    .back-btn{width:40px;height:40px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,255,255,0.12);cursor:pointer;margin-right:6px;flex:0 0 40px;transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .back-btn:hover{transform: scale(1.1) rotate(-180deg); background:rgba(255,255,255,0.2);}
+    .back-btn:active{transform: scale(0.95);}
+    .avatar{width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.14);flex:0 0 48px;cursor:pointer;transition: all 0.3s ease;}
+    .avatar:hover{transform: scale(1.05); border-color:rgba(255,255,255,0.3);}
     .avatar img{width:100%;height:100%;object-fit:cover;display:block}
     .meta{flex:1;min-width:0}
     .meta .name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .meta .status{font-size:12px;opacity:0.95}
     .icons{display:flex;gap:8px;margin-left:8px}
-    .icon-btn{width:36px;height:36px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,255,255,0.12);cursor:pointer}
-    .icon-btn:hover{transform:translateY(-2px)}
+    .icon-btn{width:36px;height:36px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,255,255,0.12);cursor:pointer;transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .icon-btn:hover{transform: translateY(-2px) scale(1.1); background:rgba(255,255,255,0.2);}
+    .icon-btn:active{transform: scale(0.95);}
     /* chat */
     .chat{padding:12px;display:flex;flex-direction:column;gap:12px;flex:1 1 auto;overflow:hidden}
     .messages{flex:1 1 auto;overflow:auto;padding-right:6px;display:flex;flex-direction:column;gap:12px}
@@ -51,19 +55,28 @@
     .dot:nth-child(3){animation-delay:.24s}
     @keyframes blink{0%,100%{opacity:.18}50%{opacity:1}}
     .options{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-    .opt{background:white;border:1px solid rgba(15,77,182,0.12);padding:10px 12px;border-radius:12px;cursor:pointer;text-align:left;color:#07284a;font-weight:600}
-    .opt:hover{background:rgba(15,77,182,0.04)}
+    .opt{background:white;border:1px solid rgba(15,77,182,0.12);padding:10px 12px;border-radius:12px;cursor:pointer;text-align:left;color:#07284a;font-weight:600;transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .opt:hover{background:rgba(15,77,182,0.04); transform: translateX(4px); box-shadow: 0 4px 8px rgba(15,77,182,0.1);}
+    .opt:active{transform: scale(0.98);}
     .footer{display:flex;gap:8px;padding:10px;background:transparent;align-items:center}
-    .start-btn{background:var(--brand);color:#fff;padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:700}
-    .start-btn.restart{background:#475569}
+    .start-btn{background:var(--brand);color:#fff;padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:700;transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .start-btn:hover{background:var(--brand-dark); transform: scale(1.05); box-shadow: 0 4px 12px rgba(15,77,182,0.3);}
+    .start-btn:active{transform: scale(0.95);}
+    .start-btn.restart{background:#475569; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .start-btn.restart:hover{background:#5a6472; transform: scale(1.05); box-shadow: 0 4px 12px rgba(71,85,105,0.3);}
+    .start-btn.restart:active{transform: scale(0.95);}
     /* profile modal */
     .profile-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,10,20,0.45);z-index:40}
     .profile-card{width:360px;background:#fff;border-radius:12px;padding:18px;color:#1b2b43;box-shadow:0 10px 30px rgba(8,20,40,0.12)}
     .profile-top{display:flex;gap:12px;align-items:center}
     .profile-top img{width:84px;height:84px;border-radius:50%;object-fit:cover}
     .profile-actions{display:flex;gap:8px;margin-top:12px}
-    .pbtn{flex:1;padding:10px;border-radius:8px;border:1px solid #e6eef9;cursor:pointer;background:#f7fbff}
-    .pbtn.whats{background:linear-gradient(90deg,var(--brand),var(--brand-dark));color:#fff;border:none}
+    .pbtn{flex:1;padding:10px;border-radius:8px;border:1px solid #e6eef9;cursor:pointer;background:#f7fbff;transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .pbtn:hover{transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+    .pbtn:active{transform: scale(0.98);}
+    .pbtn.whats{background:linear-gradient(90deg,var(--brand),var(--brand-dark));color:#fff;border:none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .pbtn.whats:hover{transform: scale(1.02); box-shadow: 0 4px 12px rgba(15,77,182,0.4);}
+    .pbtn.whats:active{transform: scale(0.98);}
     .small{font-size:13px;color:#546579}
     /* side panel */
     .side{width:260px;background:linear-gradient(180deg,#ffffff, #f7fbff);border-radius:12px;padding:12px;border:1px solid rgba(10,30,70,0.04)}
@@ -82,9 +95,13 @@
     }
     .stage-title{font-weight:800;font-size:16px;margin-bottom:6px}
     .stage-desc{font-size:14px;color:#0d3350}
-    .actions-row{display:flex;gap:8px;margin-top:10px}
-    .action-btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
-    .action-whats{background:linear-gradient(90deg,var(--brand),var(--brand-dark));color:#fff}
+    .action-buttons{display:flex;gap:8px;margin-top:10px}
+    .action-btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-weight:700;flex:1;transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .action-btn:hover{transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+    .action-btn:active{transform: scale(0.98);}
+    .action-whats{background:linear-gradient(90deg,var(--brand),var(--brand-dark));color:#fff; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .action-whats:hover{transform: scale(1.02); box-shadow: 0 4px 12px rgba(15,77,182,0.4);}
+    .action-whats:active{transform: scale(0.98);}
     /* intro overlay */
     .intro-overlay{
       position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,77,182,0.95),rgba(10,38,110,0.95));color:#fff;display:flex;align-items:center;justify-content:center;z-index:50;flex-direction:column;padding:20px;
@@ -92,7 +109,9 @@
     .brasfort-title{font-weight:900;letter-spacing:6px;margin:0;display:inline-block;transform-origin:center;filter:drop-shadow(0 6px 18px rgba(0,0,0,0.25))}
     .brasfort-sub{opacity:.95;margin-top:8px}
     .intro-card{background:rgba(255,255,255,0.06);padding:18px;border-radius:12px;text-align:center;max-width:360px}
-    .intro-cta{margin-top:14px;padding:10px 16px;border-radius:12px;border:none;background:#fff;color:var(--brand);font-weight:800;cursor:pointer}
+    .intro-cta{margin-top:14px;padding:10px 16px;border-radius:12px;border:none;background:#fff;color:var(--brand);font-weight:800;cursor:pointer;transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+    .intro-cta:hover{transform: scale(1.05); box-shadow: 0 4px 12px rgba(255,255,255,0.3);}
+    .intro-cta:active{transform: scale(0.95);}
     .intro-small{font-size:13px;opacity:.9;margin-top:10px}
     /* responsive */
     @media(max-width:900px){.app{flex-direction:column;align-items:center}.side{display:none}.phone{height:94vh;width:96vw}}
@@ -158,7 +177,7 @@
         <h4>BIA — como funciona</h4>
         <p>Conversa guiada pela BIA para avaliar sua adaptação à mudança. Responda clicando nas opções. No final, receberá um <b>estágio</b> com orientação prática (sem pontuação numérica).</p>
         <h4>Observações</h4>
-        <p class="small">Clique na foto para ver o perfil. Botão de chamada abre o WhatsApp do RH: <b>(61) 99605-0605</b>. Vídeo: não disponível.</p>
+        <p class="small">Clique na foto para ver o perfil. Botão de chamada abre o WhatsApp do RH: <b>(61) 99605-0605</b>. Vídeo: abre o WhatsApp do RH.</p>
       </aside>
     </div>
   </div>
@@ -168,7 +187,7 @@
     <div class="profile-card" role="document">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <strong>BIA 💙</strong>
-        <button onclick="closeModal()" style="background:transparent;border:none;font-size:18px;cursor:pointer">✕</button>
+        <button onclick="closeModal()" style="background:transparent;border:none;font-size:18px;cursor:pointer;transition: all 0.3s ease;">✕</button>
       </div>
       <div class="profile-top">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaVmx61OauAWoTFDJ7eMLEd1zXSnsQdQZSoQ&s" alt="bia">
@@ -181,7 +200,7 @@
       <div style="margin-top:12px">
         <div class="small">Contato RH</div>
         <div style="display:flex;gap:8px;margin-top:8px" class="profile-actions">
-          <button class="pbtn whats" onclick="openWhats()">Abrir WhatsApp<br><small style="opacity:.9">(61) 99605-0605</small></button>
+          <button class="pbtn whats" onclick="openWhatsApp()">Abrir WhatsApp<br><small style="opacity:.9">(61) 99605-0605</small></button>
           <button class="pbtn" onclick="copyNumber()">Copiar número</button>
         </div>
       </div>
@@ -393,9 +412,10 @@
     resultCard.innerHTML = `
       <div class="stage-title">Estágio detectado — <strong>${label}</strong></div>
       <div class="stage-desc">${explanation}</div>
-      <div class="actions-row">
-        <button class="action-btn action-whats" onclick="openWhats()">Falar com RH</button>
-        <button class="action-btn" id="showTipsBtn">Ver sugestões</button>
+      <!-- BOTÕES DE AÇÃO -->
+      <div class="action-buttons">
+        <button class="action-btn action-whats" onclick="openWhatsApp()">💬 Falar com RH</button>
+        <button class="action-btn" onclick="showSuggestions()">💡 Ver sugestões</button>
       </div>
     `;
     messages.appendChild(resultCard);
@@ -406,20 +426,6 @@
       resultCard.style.opacity = '1';
       resultCard.style.transform = 'translateY(0) scale(1)';
     });
- 
-    // after card, show separate oriented message when user clicks "Ver sugestões"
-    const showBtn = resultCard.querySelector('#showTipsBtn');
-    showBtn.onclick = () => {
-      if(tipsBubble) return;
-      appendBubble('Minha sugestão prática — passos objetivos para avançar:', 'bot');
-      const tips = getTipsForStage(label);
-      const tipsHtml = `<ul style="margin:8px 0 0 18px; padding-left:18px;">` +
-                       tips.map(t => `<li style="margin-bottom:6px;">${t}</li>`).join('') +
-                       `</ul>`;
-      tipsBubble = appendBubble(tipsHtml, 'bot', true);
-      appendBubble('Se preferir apoio humano, use o botão "Falar com RH" no card acima.', 'bot');
-      showBtn.style.display = 'none';
-    };
  
     // ensure restart button state
     startBtn.textContent = 'Reiniciar conversa';
@@ -479,8 +485,8 @@
   };
  
   // call / video / back
-  callBtn.addEventListener('click', openWhats);
-  videoBtn.addEventListener('click', openWhats);
+  callBtn.addEventListener('click', openWhatsApp);
+  videoBtn.addEventListener('click', openWhatsApp);
   backBtn.addEventListener('click', () => {
     if (window.history.length > 1) {
       window.history.back();
@@ -490,10 +496,6 @@
   });
  
   // utilities exposed for buttons
-  window.openWhats = () => {
-    const url = 'https://wa.me/5561996050605';
-    window.open(url, '_blank');
-  };
   window.copyNumber = () => {
     const number = '(61) 99605-0605';
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -528,6 +530,37 @@
       document.body.removeChild(textArea);
     }
   };
+
+  window.showSuggestions = () => {
+    if(tipsBubble) return;
+    appendBubble('Minha sugestão prática — passos objetivos para avançar:', 'bot');
+    const label = resultCard.querySelector('.stage-title strong').textContent;
+    const tips = getTipsForStage(label);
+    const tipsHtml = `<ul style="margin:8px 0 0 18px; padding-left:18px;">` +
+                     tips.map(t => `<li style="margin-bottom:6px;">${t}</li>`).join('') +
+                     `</ul>`;
+    tipsBubble = appendBubble(tipsHtml, 'bot', true);
+    appendBubble('Se preferir apoio humano, use o botão "Falar com RH" no card acima.', 'bot');
+    const btn = resultCard.querySelector('button[onclick="showSuggestions()"]');
+    if (btn) btn.style.display = 'none';
+  };
+
+  // Nova função openWhatsApp() - evita COOP com link dinâmico
+  function openWhatsApp() {
+    const phone = "5561996050605";
+    const message = encodeURIComponent("Olá, equipe de RH! Acabei de concluir minha avaliação de adaptação à mudança com a BIA e gostaria de conversar sobre os resultados.");
+    const url = `https://wa.me/${phone}?text=${message}`;
+
+    // Cria um link invisível e simula clique (bypassa window.open)
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';  // Segurança: não permite opener
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
  
   // initial tiny intro inside chat as fallback (will be removed when introOverlay used)
   (function initialIntroFallback(){
