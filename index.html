@@ -102,7 +102,7 @@
   <div class="stage">
     <div class="app">
       <div class="phone" role="application" aria-label="Chat BIA">
-
+ 
         <!-- header -->
         <div class="header">
           <div class="back-btn" id="backBtn" title="Voltar" aria-label="Voltar">
@@ -119,41 +119,41 @@
             <div class="icon-btn" id="callBtn" title="Abrir conversa RH (WhatsApp)" aria-label="Abrir conversa RH (WhatsApp)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.12 1.05.34 2.07.65 3.05a2 2 0 0 1-.45 2.11L8.91 10.91a16 16 0 0 0 6 6l1.03-1.03a2 2 0 0 1 2.11-.45c.98.31 2 .53 3.05.65A2 2 0 0 1 22 16.92z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div class="icon-btn" id="videoBtn" title="Chamada de vídeo" aria-label="Chamada de vídeo (não disponível)">
+            <div class="icon-btn" id="videoBtn" title="Abrir conversa RH (WhatsApp)" aria-label="Abrir conversa RH (WhatsApp)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M23 7l-7 5v4l7 5V7zM1 5h14v14H1z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
           </div>
         </div>
-
+ 
         <!-- chat -->
         <div class="chat" id="chatArea">
           <div class="messages" id="messages"></div>
-
+ 
           <div class="footer">
             <button class="start-btn" id="startBtn">Iniciar conversa</button>
           </div>
         </div>
-
+ 
         <!-- INTRO OVERLAY (macro -> micro effect) -->
         <div class="intro-overlay" id="introOverlay" aria-hidden="false">
           <div style="text-align:center">
             <div class="brasfort-title" id="brasfortTitle" style="font-size:52px;transform:scale(1);">BRASFORT</div>
             <div class="brasfort-sub" style="font-size:14px;margin-top:8px;opacity:.95">Mais que segurança, é confiança.</div>
             <div class="brasfort-sub" style="font-size:14px;margin-top:8px;opacity:.95"></div>
-
+ 
             <div class="intro-card" style="margin-top:18px">
               <div style="font-weight:700;font-size:16px;margin-bottom:6px">Conheça a BIA</div>
               <div style="font-size:14px;color:#eef5ff;opacity:.95">
                 Brasfort Inteligência Artificial.
               </div>
-              
+             
               <button class="intro-cta" id="introStartBtn" style="display:inline-block">Iniciar</button>
             </div>
           </div>
         </div>
-
+ 
       </div>
-
+ 
       <aside class="side" aria-hidden>
         <h4>BIA — como funciona</h4>
         <p>Conversa guiada pela BIA para avaliar sua adaptação à mudança. Responda clicando nas opções. No final, receberá um <b>estágio</b> com orientação prática (sem pontuação numérica).</p>
@@ -162,7 +162,7 @@
       </aside>
     </div>
   </div>
-
+ 
   <!-- profile modal -->
   <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="profile-card" role="document">
@@ -187,7 +187,7 @@
       </div>
     </div>
   </div>
-
+ 
 <script>
   // ---------- ROTEIRO (cada resposta com feedback estratégico) ----------
   const roteiro = [
@@ -240,22 +240,22 @@
       ]
     }
   ];
-
+ 
   // ---------- ELEMENTOS ----------
-  const messages      = document.getElementById('messages');
-  const startBtn      = document.getElementById('startBtn');
-  const introOverlay  = document.getElementById('introOverlay');
+  const messages = document.getElementById('messages');
+  const startBtn = document.getElementById('startBtn');
+  const introOverlay = document.getElementById('introOverlay');
   const introStartBtn = document.getElementById('introStartBtn');
   const brasfortTitle = document.getElementById('brasfortTitle');
-  const avatarBtn     = document.getElementById('avatarBtn');
-  const profileModal  = document.getElementById('profileModal');
-  const callBtn       = document.getElementById('callBtn');
-  const videoBtn      = document.getElementById('videoBtn');
-  const backBtn       = document.getElementById('backBtn');
-
+  const avatarBtn = document.getElementById('avatarBtn');
+  const profileModal = document.getElementById('profileModal');
+  const callBtn = document.getElementById('callBtn');
+  const videoBtn = document.getElementById('videoBtn');
+  const backBtn = document.getElementById('backBtn');
+ 
   let index = 0, score = 0, maxScore = roteiro.length * 17, started = false;
   let resultCard = null, tipsBubble = null;
-
+ 
   // animate brasfort title: macro -> micro
   (function animateTitle(){
     brasfortTitle.style.transform = 'scale(2.6)';
@@ -266,7 +266,7 @@
       brasfortTitle.style.opacity = '1';
     }, 80);
   })();
-
+ 
   // ---------- HELPERS ----------
   function appendBubble(text, cls='bot', html=false){
     const el = document.createElement('div');
@@ -277,7 +277,7 @@
     messages.scrollTop = messages.scrollHeight;
     return el;
   }
-
+ 
   function showTypingBubble(messageLabel = 'BIA está pensando...'){
     const t = document.createElement('div');
     t.className = 'bubble bot typing';
@@ -286,7 +286,7 @@
     messages.scrollTop = messages.scrollHeight;
     return t;
   }
-
+ 
   function renderOptions(opts){
     const container = document.createElement('div');
     container.className = 'options';
@@ -301,19 +301,19 @@
     messages.scrollTop = messages.scrollHeight;
     return container;
   }
-
+ 
   // ---------- SELEÇÃO ----------
   function selectOption(opt, container){
     appendBubble(opt.t, 'user');
     score += opt.p;
     container.remove();
-
+ 
     const thinking = showTypingBubble();
     const thinkingTime = 900 + Math.floor(Math.random()*900);
     setTimeout(()=> {
       thinking.remove();
       appendBubble(opt.feedback, 'bot');
-
+ 
       index++;
       if(index < roteiro.length){
         setTimeout(()=> askQuestion(index), 800);
@@ -322,7 +322,7 @@
       }
     }, thinkingTime);
   }
-
+ 
   function askQuestion(i){
     const t = showTypingBubble('BIA está preparando a próxima pergunta...');
     const delay = 500 + Math.floor(Math.random()*600);
@@ -333,7 +333,7 @@
       renderOptions(q.opts);
     }, delay);
   }
-
+ 
   // ---------- INICIO DA CONVERSA ----------
   function startConversation(){
     // hide intro overlay (if visible)
@@ -341,13 +341,13 @@
       introOverlay.style.display = 'none';
       introOverlay.setAttribute('aria-hidden','true');
     }
-
+ 
     // reset
     messages.innerHTML = '';
     index = 0; score = 0; started = true; resultCard = null; tipsBubble = null;
     startBtn.textContent = 'Reiniciar conversa';
     startBtn.classList.add('restart');
-
+ 
     // initial BIA intro as chat message (with typing)
     const t = showTypingBubble('BIA está iniciando a avaliação...');
     setTimeout(()=> {
@@ -357,12 +357,12 @@
       setTimeout(()=> askQuestion(0), 900);
     }, 1000);
   }
-
+ 
   // ---------- RESULTADO (CARD COLORIDO + MENSAGEM DE ORIENTAÇÃO) ----------
   function showResultCard(){
     const percent = Math.min(Math.round((score / maxScore) * 100), 100);
     let label='', explanation='', color='', textColor='#08304a';
-
+ 
     if(percent <= 25){
       label = 'Choque / Incerteza';
       explanation = 'Com base nas suas respostas, você está no começo do processo de assimilação. Priorize compreensão objetiva do propósito e peça apoio direto.';
@@ -384,7 +384,7 @@
       color = 'var(--card-blue)';
       textColor = '#06314d';
     }
-
+ 
     // create card
     resultCard = document.createElement('div');
     resultCard.className = 'result-card';
@@ -400,13 +400,13 @@
     `;
     messages.appendChild(resultCard);
     messages.scrollTop = messages.scrollHeight;
-
+ 
     // animate in
     requestAnimationFrame(()=> {
       resultCard.style.opacity = '1';
       resultCard.style.transform = 'translateY(0) scale(1)';
     });
-
+ 
     // after card, show separate oriented message when user clicks "Ver sugestões"
     const showBtn = resultCard.querySelector('#showTipsBtn');
     showBtn.onclick = () => {
@@ -420,12 +420,12 @@
       appendBubble('Se preferir apoio humano, use o botão "Falar com RH" no card acima.', 'bot');
       showBtn.style.display = 'none';
     };
-
+ 
     // ensure restart button state
     startBtn.textContent = 'Reiniciar conversa';
     startBtn.classList.add('restart');
   }
-
+ 
   function getTipsForStage(label){
     if(label === 'Choque / Incerteza'){
       return [
@@ -454,7 +454,7 @@
       'Proponha uma melhoria com base na sua experiência prática.'
     ];
   }
-
+ 
   // ---------- HANDLERS ----------
   // start via intro button
   introStartBtn.addEventListener('click', startConversation);
@@ -467,7 +467,7 @@
       startConversation();
     }
   });
-
+ 
   // profile modal
   avatarBtn.addEventListener('click', () => {
     profileModal.style.display = 'flex';
@@ -477,19 +477,58 @@
     profileModal.style.display = 'none';
     profileModal.setAttribute('aria-hidden','true');
   };
-
+ 
   // call / video / back
   callBtn.addEventListener('click', openWhats);
-  videoBtn.addEventListener('click', ()=> alert('Recurso de vídeo não está disponível no momento.'));
-  backBtn.addEventListener('click', ()=> history.back());
-
+  videoBtn.addEventListener('click', openWhats);
+  backBtn.addEventListener('click', () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.reload();
+    }
+  });
+ 
   // utilities exposed for buttons
-  window.openWhats = () => window.open('https://wa.me/5561996050605', '_blank');
-  window.copyNumber = () => {
-    navigator.clipboard?.writeText('(61) 99605-0605');
-    alert('Número copiado: (61) 99605-0605');
+  window.openWhats = () => {
+    const url = 'https://wa.me/5561996050605';
+    window.open(url, '_blank');
   };
-
+  window.copyNumber = () => {
+    const number = '(61) 99605-0605';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(number).then(() => {
+        alert('Número copiado: ' + number);
+      }).catch(() => {
+        // Fallback para navegadores mais antigos
+        const textArea = document.createElement('textarea');
+        textArea.value = number;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          alert('Número copiado: ' + number);
+        } catch (err) {
+          alert('Falha ao copiar. Número: ' + number);
+        }
+        document.body.removeChild(textArea);
+      });
+    } else {
+      // Fallback antigo
+      const textArea = document.createElement('textarea');
+      textArea.value = number;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        alert('Número copiado: ' + number);
+      } catch (err) {
+        alert('Falha ao copiar. Número: ' + number);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+ 
   // initial tiny intro inside chat as fallback (will be removed when introOverlay used)
   (function initialIntroFallback(){
     // placeholder message will be replaced when the user starts via intro overlay
@@ -499,5 +538,3 @@
 </script>
 </body>
 </html>
-
-
